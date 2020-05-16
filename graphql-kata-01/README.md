@@ -7,8 +7,12 @@ Présentation du concept, installation des outils et initialisation d'un projet 
 
 # Prerequis de la formation:
 
-1.	Installez GraphQL Altair Firefox/Chrome Plugin ou GraphQL Playground [GraphQL Playgound](https://github.com/prisma-labs/graphql-playground/releases)
-2.	Installez Node JS [Node JS](https://nodejs.org/en/download/)
+1.	Installez l'un des trois selon vos habitudes (moi j'utilise [GraphQL Playgound](https://github.com/prisma-labs/graphql-playground/releases))
+    *   [GraphQL Altair (Firefox)](https://addons.mozilla.org/fr/firefox/addon/altair-graphql-client/)
+    *   [GraphQL Altair (Chrome)](https://chrome.google.com/webstore/detail/altair-graphql-client/flnheeellpciglgpaodhkhmapeljopja)
+    *   [GraphQL Playgound](https://github.com/prisma-labs/graphql-playground/releases)
+
+2.	Installez [Node JS](https://nodejs.org/en/download/)
 
 3.  Vérifier l'installation avec les commandes 
     
