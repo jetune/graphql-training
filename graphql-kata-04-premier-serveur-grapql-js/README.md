@@ -34,8 +34,7 @@ Présentation du concept, installation des outils et initialisation d'un projet 
 	
 	*	`"start": "nodemon -e js,json,graphql"`
 		
-		Ceci permettra de demarrer nodemon en lui demandant de monitorer toute modification des fichier ayant les extensions
-		js, json ou graphql et de redemarrer le serveur node dans ce cas
+		Ceci permettra de demarrer nodemon en lui demandant de monitorer toutes les modification sur des fichiers ayant les extensions `js, json ou graphql` et de redemarrer le serveur node dans ce cas
 
 4.	Assurez-vous que le fichier de demarrage de votre application soit `index.js`
 
