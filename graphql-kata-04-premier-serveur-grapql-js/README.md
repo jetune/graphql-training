@@ -2,22 +2,7 @@
 <a href="http://www.adservio.fr/"><img width="150" src="https://pbs.twimg.com/profile_images/1057285534459015169/s1_C47ND_400x400.jpg" /></a>
 <a href="https://graphql.org/"><img width="400" src="https://blog.soat.fr/wp-content/uploads/2019/01/GraphQL-600x210.png" /></a>
 
-Présentation du concept, installation des outils et initialisation d'un projet de base
-
-
-# Prerequis de la formation:
-
-1.	Installez l'un des trois selon vos habitudes (moi j'utilise [GraphQL Playgound](https://github.com/prisma-labs/graphql-playground/releases))
-    *   [GraphQL Altair (Firefox)](https://addons.mozilla.org/fr/firefox/addon/altair-graphql-client/)
-    *   [GraphQL Altair (Chrome)](https://chrome.google.com/webstore/detail/altair-graphql-client/flnheeellpciglgpaodhkhmapeljopja)
-    *   [GraphQL Playgound](https://github.com/prisma-labs/graphql-playground/releases)
-
-2.	Installez [Node JS](https://nodejs.org/en/download/)
-
-3.  Vérifier l'installation avec les commandes 
-    
-    *   `node -v`
-    *   `npm -v`
+Mise en place d'un serveur GrapQL en Javascript
 
 # Initialisation d'un serveur GraphQL JS (Apollo Server)
 
