@@ -12,10 +12,10 @@
 ```
 const typeDefs = `
     type Query {
-        totalPhotos: Int!
+        totalPictures: Int!
     }
 	type Mutation {
-        postPhoto(name: String!, description: String!): Boolean!
+        postPicture(name: String!, description: String!): Boolean!
     }
 `
 ```
@@ -23,22 +23,22 @@ const typeDefs = `
 8.	Déclarer un tableau qui contiendra les photos postées depuis le client de l'API
 ```	
 // Photos Array
-const photos = [];
+const pictures = [];
 ```
 
-9.	Adaptez le resolver de l'opération `totalPhotos` afin de renvoyer le nombre exact de photos et implémentez un resolver pour l'opération de mutation rajoutée dans le schéma
+9.	Adaptez le resolver de l'opération `totalPictures` afin de renvoyer le nombre exact de photos et implémentez un resolver pour l'opération de mutation rajoutée dans le schéma
 ```	
 
 // define a resolver that fetch data on the preceding schema
 const resolvers = {
     Query: {
-        totalPhotos: () => photos.length
+        totalPictures: () => pictures.length
     },
     Mutation: {
-        postPhoto(parent, args) {
+        postPicture(parent, args) {
 
             // Add the new photo in the tab
-            photos.push({
+            pictures.push({
                 name: args.name,
                 description: args.description
             });
@@ -64,15 +64,15 @@ const resolvers = {
 	*	Dans un onglet à part, exécutons tout d'abors la requête de décompte des photos: le résultat est 0
 
 		```
-		query myQuery {
-			totalPhotos
+		query countPictures {
+			totalPictures
 		}
 		```
 	*	Exécutons ensuite la mutation suivante, permettant de rajouter une nouvelle photo
 
 		```
-		mutation addPhoto {
-			postPhoto(name: "photo-01", description: "Photo 01")
+		mutation addPicture {
+			postPicture(name: "photo-01", description: "Photo 01")
 		}
 		```
 	

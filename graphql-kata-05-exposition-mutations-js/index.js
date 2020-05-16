@@ -3,14 +3,14 @@ const { ApolloServer } = require("apollo-server");
 // Define a schema
 const typeDefs = `
     type Query {
-        totalPhotos: Int!
+        totalPictures: Int!
     }
 `
 
 // define a resolver that implements previous schema definiion
 const resolvers = {
     Query: {
-        totalPhotos: () => 12
+        totalPictures: () => 12
     }
 }
 
