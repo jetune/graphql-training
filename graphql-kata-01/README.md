@@ -1,6 +1,6 @@
 # Formation d'introduction à GraphQL
-
-![GraphQL](https://blog.soat.fr/wp-content/uploads/2019/01/GraphQL-600x210.png)
+<a href="http://www.adservio.fr/"><img width="150" src="https://pbs.twimg.com/profile_images/1057285534459015169/s1_C47ND_400x400.jpg" /></a>
+<a href="https://graphql.org/"><img width="400" src="https://blog.soat.fr/wp-content/uploads/2019/01/GraphQL-600x210.png" /></a>
 
 Présentation du concept, installation des outils et initialisation d'un projet de base
 
