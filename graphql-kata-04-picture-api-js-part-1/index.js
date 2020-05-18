@@ -1,11 +1,8 @@
 const { ApolloServer } = require("apollo-server");
+const gqlSchema = require("./schema");
 
 // Define a schema
-const typeDefs = `
-    type Query {
-        totalPictures: Int!
-    }
-`
+const typeDefs = gqlSchema.typeDefs;
 
 // define a resolver that implements previous schema definiion
 const resolvers = {

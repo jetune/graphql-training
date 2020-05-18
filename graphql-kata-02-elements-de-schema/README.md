@@ -2,16 +2,19 @@
 <a href="http://www.adservio.fr/"><img width="150" src="https://pbs.twimg.com/profile_images/1057285534459015169/s1_C47ND_400x400.jpg" /></a>
 <a href="https://graphql.org/"><img width="400" src="https://blog.soat.fr/wp-content/uploads/2019/01/GraphQL-600x210.png" /></a>
 
+Le but de ce Kata est de présenter certaines des constructions fournies par GraphQL pour nous permettre de mettre en place une API comme cette que nous avons découverte dans le Kata précédent.
 
-#	Quelques rappels importants
+# Quelques rappels importants
 
-1.	Un schéma d'API GraphQL représente l'ensemble des types de données (entrées/sortie) et des opérations exposés par l'API.
+1. Un schéma d'API GraphQL représente l'ensemble des types de données (entrées/sortie) et des opérations exposés par l'API.
 
-2.	GraphQL fournit un langage SDL (Schema Definition Language) qui est une DSL (Domain Specific Language) permettant de décrire un schéma d'API (Type de données et Opérations).
+2. GraphQL fournit un langage SDL (Schema Definition Language) qui est une DSL (Domain Specific Language) permettant de décrire un schéma d'API (Type de données et Opérations).
 
-3.	Un `Type` de données, comme dans la plupart des langages de programmation, permet de représenter et caractériser un concept lié à notre contexte métier ou technique
+3. Un `Type` de données, comme dans la plupart des langages de programmation, permet de représenter et caractériser un concept lié à notre contexte métier ou technique
 
 4.	Un schéma GraphQL peut être définit de plusieurs manière (chaine de caractère, fichier texte souvent d'extension .graphql)
+
+5.	Pour chacun des champs déclarés dans un schéma nous devront mettre en place un `Resolver` qui sera en quelque sorte son imlémentation.
 
 # Définition de schémas d'API GraphQL
 
@@ -192,7 +195,6 @@
 	Tout comme les 'Query' ou les 'Mutation', les 'Subscription' peuvent être déclaré avec des paramètres. Ces paramètres, peuvent être utilisés par le "Resolver (L'implémentation)" de la souscription afin d'opérer des filtres sur les évènements à retourner au client.
 	```
 
-
 # Définition de schémas d'API GraphQL
 
 1.	Nous pouvons définir un schéma GraphQL
@@ -203,34 +205,7 @@
 	const { gql } = require('apollo-server');
 
 	// Define a schema
-	const typeDefs = gql`
-		enum PictureCategory {
-			SELFIE,
-			PORTRAIT,
-			LANDSCAPE,
-			GRAPHIC,
-			ACTION
-		}
-		type Picture {
-			id: ID!,
-			name: String!,
-			url: String!,
-			description: String,
-			category: PictureCategory!
-		}
-		input PictureInput {
-			name: String!,
-			description: String,
-			category: PictureCategory=SELFIE
-		}
-		type Query {
-			totalPictures: Int!,
-			allPictures: [Picture!]!
-		}
-		type Mutation {
-			postPicture(picture: PictureInput!): Picture!
-		}
-	`;
+	const typeDefs = gql`...`;
 
 	module.exports.typeDefs = typeDefs;
 	```
@@ -238,7 +213,7 @@
 	```
 	const { ApolloServer, gql } = require('apollo-server');
 	const gqlSchema = require("./schema");
-
+	
 	// Define a schema
 	const typeDefs = gqlSchema.typeDefs;
 

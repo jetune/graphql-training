@@ -2,23 +2,26 @@
 <a href="http://www.adservio.fr/"><img width="150" src="https://pbs.twimg.com/profile_images/1057285534459015169/s1_C47ND_400x400.jpg" /></a>
 <a href="https://graphql.org/"><img width="400" src="https://blog.soat.fr/wp-content/uploads/2019/01/GraphQL-600x210.png" /></a>
 
-Installation des outils de base et navigation dans des API GraphQL publiques
+Le but de ce Kata est de découvrir ensemble, d'un point de vue consommateur, à quoi ressemble une API GraphQL.
+*	Installer les outils de base
+*	Accéder à une API GraphQL publique pour y exécuter un ensemble de requêtes
 
 # Installation des outils
 
-1.	Installez l'un des trois selon vos habitudes (moi j'utilise [GraphQL Playgound](https://github.com/prisma-labs/graphql-playground/releases))
+1.	Installez l'un des trois selon vos habitudes (moi j'utilise [GraphQL Playgound](https://github.com/prisma-labs/graphql-playground/releases) en version intégrée à l'API)
     *   [GraphQL Altair (Firefox)](https://addons.mozilla.org/fr/firefox/addon/altair-graphql-client/)
     *   [GraphQL Altair (Chrome)](https://chrome.google.com/webstore/detail/altair-graphql-client/flnheeellpciglgpaodhkhmapeljopja)
     *   [GraphQL Playgound](https://github.com/prisma-labs/graphql-playground/releases)
 
 2.	Installez [Node JS](https://nodejs.org/en/download/)
+	Node JS n'est pas obligatoire pour le présent KATA, mais il sera utile pour la suite.
 
 3.  Vérifier l'installation avec les commandes 
     
     *   `node -v`
     *   `npm -v`
 
-4.	Ouvrez le client GraphQL et pointez sur l'API GrapQL `http://snowtooth.moonhighway.com/`
+4.	Ouvrez le client GraphQL (ou le navigateur) et pointez sur l'API GrapQL `http://snowtooth.moonhighway.com/`
 
 5.	Naviguez dans la documentation de l'API via les onglets `schemas` et `docs` à droite.
 
@@ -184,7 +187,40 @@ query {
   }
 }
 ```
+# Présentation des requêtes de mutation
 
-12.	Unions à développer
+1.	requête de mise à jour du statut d'un Lift dont l'ID est `jazz-cat`
+```
+mutation updateLiftStatus {
+  setLiftStatus(id: "jazz-cat", status: CLOSED) {
+    id,
+    name,
+    status,
+    capacity
+  }
+}
+```
 
-13.	Interface à développer
+12.	Présentation d'une requête de souscription
+```
+subscription {
+  liftStatusChange {
+    name
+    capacity
+    status
+  }
+}
+```
+Cette requête permet d'ecouter tous les évènements de mise à jour des objets de type `Lift` et affiche en retour les propriétés sélectionnées de l'objet modifié.
+
+Une fois cette requête de souscription lancée, nous allons ouvrir un autre onglet et lancer une `mutation` du statut d'un `Lift` : Nous verront que une fois le statut modifié, nous avons reçu une notification comme résultat de la souscription.
+```
+mutation updateLiftStatus {
+  setLiftStatus(id: "jazz-cat", status: CLOSED) {
+    id,
+    name,
+    status,
+    capacity
+  }
+}
+```

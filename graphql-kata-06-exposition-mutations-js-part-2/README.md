@@ -4,6 +4,8 @@
 
 # Exposition d'opérations de mutation : Partie II 
 
+0.	Rendez-vous dans le répertoire du Kata
+
 1.	Installez les dépendances du projet
 	
 	*	`npm install`

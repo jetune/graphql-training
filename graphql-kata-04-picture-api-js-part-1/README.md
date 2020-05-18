@@ -2,7 +2,11 @@
 <a href="http://www.adservio.fr/"><img width="150" src="https://pbs.twimg.com/profile_images/1057285534459015169/s1_C47ND_400x400.jpg" /></a>
 <a href="https://graphql.org/"><img width="400" src="https://blog.soat.fr/wp-content/uploads/2019/01/GraphQL-600x210.png" /></a>
 
-# Exposition d'opérations de mutation : Partie I
+Le but de ce Kata est de présenter la définition et l'implémentation d'opérations de base (selection, mutation, souscription) proposées par GraphQL
+
+# Un peu de dynamisme dans nos photos
+
+0.	Rendez-vous dans le répertoire du Kata
 
 1.	Installez les dépendances du projet
 	
@@ -20,7 +24,7 @@ const typeDefs = `
 `
 ```
 
-8.	Déclarer un tableau qui contiendra les photos postées depuis le client de l'API
+8.	Déclarer dans le fichier `index.js`, un tableau qui contiendra les photos postées depuis le client de l'API
 ```	
 // Photos Array
 const pictures = [];
@@ -93,9 +97,9 @@ Pour l'exécuter, il suffira juste de luis définir des paramètres lors de l'ex
 }
 ```
 
-15.	Resolvers et types de données utilisateur.
-En plus des types de données de base fournit de base, GraphQL offre aussi la possibilité de créer des types de composite et de construire des requêtes et mutations sur cette base.
-Nous allons donc refactorer notre service afin de consolider les données des photos dans un objet de type `Picture` et rajouter une requête permettant de lister toutes les photos.
+15.	Type de données `Picture` : Données de sortie d'opération
+
+	Nous allons refactorer notre service afin de consolider les données des photos dans un objet de type `Picture` et rajouter une requête permettant de lister toutes les photos.
 
 	*	Rajout du type `Picture`
 		```
@@ -196,9 +200,10 @@ Nous allons donc refactorer notre service afin de consolider les données des ph
 	```
 	Nous avons une erreur qui apparait. En effet, le champ URL n'as pas de valeur lors de la requête, alors qu'il est marqué comme non null. Ce contrôle se fait lors de la restitution de l'objet et non lors de son enregistrement.
 
-	Pour que es choses se passent correctement, nous avons 2 possibilités :
-	*	Calculer et stocker le cham lors de l'enregistrement (ce qui ne nous arrange pas toujours vu que dans notre cas c'est un champ calculé à partir des autres champs et donc on a pas besoin de le stocker)
-	*	Calculer le champ lorsque le client en a besoin et uniquement à ce moment là: c'est la solution que nous allons mettre en place.
+	Pour que es choses se passent correctement, nous avons plusieurs possibilités parmis lesquelles :
+	*	Postez la valeur du champ `url` depuis le client pour qu'il soit stocké avec les autres informations de la photo
+	*	Calculer et stocker le champ `url` lors de l'enregistrement
+	*	Calculer le champ lorsque le client en a besoin et uniquement à ce moment là: c'est la solution que nous allons mettre en place afin d'illustrer le concept de resolver de champ à la demande.
 
 18.	Définir un `Resolver` permettant de s'occuper de la résolution de la propriété `url` et qui ne s'exécutera donc que lorsque le client en aura besoin
 ```
@@ -342,4 +347,111 @@ Une fois définit et enregistré, on pourra désormais requêter les photos en d
 		}
 		```
 
+20.	Nous allons pour terminer ce Kata, nous interesser aux souscriptions. En effet, GraphQL permet de définir des types d'objets permettant d'écouter en mode `PubSub` les évènements de mutation (Création, Modification, Suppression) concernant des types de données de l'API.
 
+	*	Créons dans le schéma une `souscription` afin de suivre les évènements liés au cycle de vie des objets de type `picture`
+	```
+	type Subscription {
+        pictureAdded: Picture
+    }
+	```
+	* Rajoutons et exportons une constante qui contiendra le nom de l'évènement d'ajout de photo
+	```
+	// Event type name
+	const PICTURE_ADDED_EVENT_TYPE = "PictureAddedEvent";
+
+	// Export Add evet type name
+	module.exports.PICTURE_ADDED_EVENT_TYPE = PICTURE_ADDED_EVENT_TYPE;
+	```
+	* Importons la classe `PubSub` depuis le module `apollo-server`: cette classe nous permettra de publier des évènements.
+	```
+	const { ApolloServer, PubSub } = require('apollo-server');
+	```
+	*	En effet, la classe `PubSub` est une implémentation `in-memory` et `non-production-ready` de l'interface `PubSubEngine` permettant de publier des évènements. Cette implémentation n'est pas recommendée pour les besoins de production, du fait qu'elle ne supporte pas la distribution d'évènements distribués (implémentation `in-memory`). Pour la production, il est conseillé d'utiliser des implémentations telles que: 
+		-	[graphql-redis-subscriptions](https://github.com/davidyaha/graphql-redis-subscriptions)
+		-	[graphql-kafka-subscriptions](https://github.com/ancashoria/graphql-kafka-subscriptions)
+		-	[graphql-rabbitmq-subscriptions](https://github.com/cdmbase/graphql-rabbitmq-subscriptions)
+		-	[graphql-postgres-subscriptions](https://github.com/GraphQLCollege/graphql-postgres-subscriptions)
+		-	[graphql-google-pubsub](https://github.com/axelspringer/graphql-google-pubsub)
+		-	etc...
+	*	Récupérons le nom de l'évènement précédemment exporté et instantions un objet `PubSub`
+	```	
+	// Get the event type for added pcture
+	const PICTURE_ADDED_EVENT_TYPE = gqlSchema.PICTURE_ADDED_EVENT_TYPE;
+
+	// Instantiate a publisher/subscriber
+	const pubsub = new PubSub();
+	```
+	* Rajoutons, dans le resolver d'implémentation de la mutation d'ajout de photo, la publication d'un évènement, juste après avoir effectué l'ajout de la novelle photo
+	```
+	Mutation: {
+        postPicture(_parent, args) {
+			...
+            // Add the new picture in the tab
+            pictures.push(newPicture);
+
+            // Publish event
+            pubsub.publish(PICTURE_ADDED_EVENT_TYPE, { pictureAdded: newPicture });
+            ...
+        }
+    }
+	```
+
+	*	Rajoutons un `resolver` permettant de prendre en charge les requêtes de soucription venant des clients
+	```
+	Subscription: {
+        pictureAdded: {
+            subscribe: () => pubsub.asyncIterator([PICTURE_ADDED_EVENT_TYPE])
+        }
+    }
+	```
+	Comme vous le constaterez, l'implémentation d'une requête de souscription pour un évènement donné sera pris en charge par une fonction qui retournera un objet `AsyncIterator` dont le but est d'écouter les évènements de manière qsynchrone, via un protocole de transport `websocket`.
+	La configuration du serveur `Websocket` est déjà intégrée au serveur `ApolloServer` et est confiuragle via la propriété `subscriptions` qui est un objet permettant de préciser entre autre le `path` sur lequel ApolloServer écoutera les requêtes de souscription.
+	```
+	// Define a graphql server to expose typeDefs and resolvers
+	const server = new ApolloServer({
+		typeDefs,
+		resolvers,
+		subscriptions: {
+			path: "/",
+			onConnect: () => console.log("=======> Connection to subscription")
+		}
+	});
+	```
+	*	Assurons nous que le serveur GraphQL est démarré
+	```
+	npm start
+	```
+	*	Exécutons une requête de souscription
+	```
+	subscription pictureEventListener {
+		pictureAdded {
+			id,
+			name,
+			category
+		}
+	}
+	```
+	Vous noterez que l'exécution de cette requête va mettre le client GraphQL en attente d'évènements `Listening`.
+	*	Dans un autre onglet, executons une mutation (paramétrée) d'enregistrement d'une photo
+	```
+	  mutation addPhoto($picture: PictureInput!) {
+		postPicture(picture: $picture) {
+			id,
+			name,
+			description,
+			category
+		}
+	}
+	```
+	Variables de la mutation
+	```
+	{
+		"picture": {
+			"name": "picture1",
+			"description": "Picture of index 1",
+			"category": "PORTRAIT"
+		}
+	}
+	```
+	*	Si nous rentrons dans l'onglet de la souscription, nous verrons apparaitre l'évènement de creation de la photo précédente.

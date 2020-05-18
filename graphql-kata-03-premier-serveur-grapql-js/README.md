@@ -2,9 +2,11 @@
 <a href="http://www.adservio.fr/"><img width="150" src="https://pbs.twimg.com/profile_images/1057285534459015169/s1_C47ND_400x400.jpg" /></a>
 <a href="https://graphql.org/"><img width="400" src="https://blog.soat.fr/wp-content/uploads/2019/01/GraphQL-600x210.png" /></a>
 
-Mise en place d'un serveur GrapQL en Javascript
+le but de ce Kata est de mettre en place notre propre serveur GraphQL, et d'implémenter notre première API en Javascript
 
 # Initialisation d'un serveur GraphQL JS (Apollo Server)
+
+0.	Rendez-vous dans le répertoire du Kata
 
 1.	Initialisez le projet
 	
@@ -25,38 +27,54 @@ Mise en place d'un serveur GrapQL en Javascript
 
 5.	Créez le fichier `index.js` à la racine du projet
 
-6.	Chargez le serveur Apollo dans le fichier "index.js"
+6.	Chargez les librairies du serveur Apollo dans le fichier "index.js"
 	
 	`const { ApolloServer } = require("apollo-server");`
 
 7.	Définissez le schémas de votre API GraphQL
-```
-const typeDefs = `
-    type Query {
-        totalPhotos: Int!
-    }
-`
-```
+	*	Créer un fichier `schema.js` qui contiendra le schema GraphQL 
+	*	Rajouter la définition du schema
+	```
+	const { gql } = require('apollo-server');
 
-8.	Implémentez le RESOLVER qui prendra en charge les requêtes et Mutations de votre schéma
-```	
-// define a resolver that fetch data on the preceding schema
-const resolvers = {
-	Query: {
-		totalPhotos: () => 42
+	// Define schema
+	const typeDefs = gql`
+		type Query {
+			totalPhotos: Int!
+		}
+	`;
+
+	// Export schema
+	module.exports.typeDefs = typeDefs;
+	```
+	*	Importez le schema dans le fichier `index.js`
+	```
+	// Import schema
+	const gqlSchema = require("./schema");
+
+	// extract schema in local var
+	const typeDefs = gqlSchema.typeDefs;
+	```
+
+8.	Implémentez le `RESOLVER` qui prendra en charge les requêtes et mutations de votre schéma
+	```	
+	// define a resolver that fetch data on the preceding schema
+	const resolvers = {
+		Query: {
+			totalPhotos: () => 42
+		}
 	}
-}
-```
+	```
 
 9.	Instantiez et demarrez votre serveur Apollo sur un port de votre choix
-```	
-const server = new ApolloServer({
-	typeDefs,
-	resolvers
-});
-const port = process.env.PORT || 5001;
-server.listen(port).then(({ url }) => console.log(`Serveur GraphQL démarré : [ URL = ${url} ]`));
-```
+	```	
+	const server = new ApolloServer({
+		typeDefs,
+		resolvers
+	});
+	const port = process.env.PORT || 5001;
+	server.listen(port).then(({ url }) => console.log(`Serveur GraphQL démarré : [ URL = ${url} ]`));
+	```
 
 11. Démarrez votre application
 
@@ -66,8 +84,8 @@ server.listen(port).then(({ url }) => console.log(`Serveur GraphQL démarré : [
 
 13.	Vous avez accès à la documentation de l'API GraphQL et vous pouvez tester votre requête
 
-```
-query myQuery {
-    totalPhotos 
-}
-```
+	```
+	query myQuery {
+		totalPhotos 
+	}
+	```
