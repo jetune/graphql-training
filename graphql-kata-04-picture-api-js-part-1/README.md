@@ -435,7 +435,7 @@ Une fois définit et enregistré, on pourra désormais requêter les photos en d
 	Vous noterez que l'exécution de cette requête va mettre le client GraphQL en attente d'évènements `Listening`.
 	*	Dans un autre onglet, executons une mutation (paramétrée) d'enregistrement d'une photo
 	```
-	  mutation addPhoto($picture: PictureInput!) {
+	  mutation addPicture($picture: PictureInput!) {
 		postPicture(picture: $picture) {
 			id,
 			name,

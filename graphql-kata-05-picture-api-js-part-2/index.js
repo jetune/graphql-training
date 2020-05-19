@@ -1,34 +1,15 @@
-const { ApolloServer } = require("apollo-server");
+const { ApolloServer, PubSub } = require('apollo-server');
+const gqlSchema = require("./schema");
 
 // Define a schema
-const typeDefs = `
-    enum PictureCategory {
-        SELFIE,
-        PORTRAIT,
-        LANDSCAPE,
-        GRAPHIC,
-        ACTION
-    }
-    type Picture {
-        id: ID!,
-        name: String!,
-        url: String!,
-        description: String,
-        category: PictureCategory!
-    }
-    input PictureInput {
-        name: String!,
-        description: String,
-        category: PictureCategory=SELFIE
-    }
-    type Query {
-        totalPictures: Int!,
-        allPictures: [Picture!]!
-    }
-    type Mutation {
-        postPicture(picture: PictureInput!): Picture!
-    }
-`
+const typeDefs = gqlSchema.typeDefs;
+
+// Get the event type for added pcture
+const PICTURE_ADDED_EVENT_TYPE = gqlSchema.PICTURE_ADDED_EVENT_TYPE;
+
+// Instantiate a publisher/subscriber
+const pubsub = new PubSub();
+
 // Picture Array
 const pictures = [];
 
@@ -52,19 +33,31 @@ const resolvers = {
             // Add the new picture in the tab
             pictures.push(newPicture);
 
+            // Publish event
+            pubsub.publish(PICTURE_ADDED_EVENT_TYPE, { pictureAdded: newPicture });
+
             // Return the registered picture
             return newPicture;
         }
     },
     Picture: {
         url: (_parent) => `http://lab.adservio.fr/media/${_parent.id}.jpg`
+    },
+    Subscription: {
+        pictureAdded: {
+            subscribe: () => pubsub.asyncIterator([PICTURE_ADDED_EVENT_TYPE])
+        }
     }
 }
 
 // Define a graphql server to expose typeDefs and resolvers
 const server = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    subscriptions: {
+        path: "/",
+        onConnect: () => console.log("=======> Connection to subscription")
+    }
 });
 
 // Define port
