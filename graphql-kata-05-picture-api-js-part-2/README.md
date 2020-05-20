@@ -280,14 +280,8 @@ Comme vous pouvez le voir, la classe `GraphQLScalarType` permet de décrire comm
 	*	Initialisez la liste des utilisateurs et des photos comme suit
 	```
 	// User array
-	const users = [
-		{ "login": "jetune", "name": "Jean-Jacques ETUNE NGI", "avatar": "" },
-		{ "login": "ryo", "name": "Sakazaki RYO", "avatar": "" },
-		{ "login": "eiji", "name": "Kisaragi EIJI", "avatar": "" },
-		{ "login": "ryuji", "name": "YAMAZAKI Ryuji", "avatar": "" },
-		{ "login": "terry", "name": "BOGARD Terry", "avatar": "" }
-	];
-
+	const users = [...];
+	
 	// Picture Array
 	const pictures = [
 		{ id: "1", "name": "picture 01", "description": "Pircture 01", url: "http://lab.adservio.fr/media/1.jpg", "category": "PORTRAIT", "postBy": users[0], "postDate": new Date("2020-05-18 16:10:22") },
