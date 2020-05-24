@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+	
 	<!-- Model version -->
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<!-- Project parent definition -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -11,70 +11,83 @@
 		<version>2.3.0.RELEASE</version>
 		<relativePath />
 	</parent>
-
+	
 	<!-- Project group ID -->
 	<groupId>fr.adservio.training.graphql</groupId>
-
+	
 	<!-- Project artifact ID -->
 	<artifactId>graphql-kata-06-picture-api-spring</artifactId>
-
+	
 	<!-- Project version -->
 	<version>0.0.1-SNAPSHOT</version>
-
+	
 	<!-- Project name -->
 	<name>[]GraphQL::Training] - Kata 06 Picture API Spring Server</name>
-
+	
 	<!-- Project description -->
 	<description>GraphQL API Server build on Spring framework</description>
-
+	
 	<!-- Project properties -->
 	<properties>
-
+		
 		<!-- Java version property -->
 		<java.version>11</java.version>
-
+		
 		<!-- GraphQL Java version property -->
 		<graphql-java.version>14.0</graphql-java.version>
-
+		
 		<!-- Google Guava version property -->
 		<guava.version>29.0-jre</guava.version>
-
+		
 	</properties>
-
+	
 	<!-- Project dependencies -->
 	<dependencies>
-
+		
 		<!-- Spring boot starter web dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
-		<!-- Spring bot starter DevTools -->
+		
+		<!-- Spring boot starter websocket dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
-
+		
+		<!-- Spring bot starter DevTools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+		
 		<!-- Lombok dependency -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-
+		
 		<!-- Google GSon dependency -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
-
+		
+		<!-- GraphQL Java dependency -->
+		<dependency>
+			<groupId>com.graphql-java</groupId>
+			<artifactId>graphql-java</artifactId>
+			<version>${graphql-java.version}</version>
+		</dependency>
+		
 		<!-- Google Guava dependency -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
 		</dependency>
-
+		
 		<!-- Spring boot test starter dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -87,23 +100,23 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+		
 	</dependencies>
-
+	
 	<!-- Project build configuration -->
 	<build>
-
+		
 		<!-- Plugins configuration -->
 		<plugins>
-
+			
 			<!-- Spring boot plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
+			
 		</plugins>
-
+		
 	</build>
 
 </project>

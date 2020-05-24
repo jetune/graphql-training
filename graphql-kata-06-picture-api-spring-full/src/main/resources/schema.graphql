@@ -1,0 +1,34 @@
+enum PictureCategory {
+    SELFIE,
+    PORTRAIT,
+    LANDSCAPE,
+    GRAPHIC,
+    ACTION
+}
+
+type Picture {
+    id: ID!,
+    name: String!,
+    url: String!,
+    description: String,
+    category: PictureCategory!
+}
+
+input PictureInput {
+    name: String!,
+    description: String,
+    category: PictureCategory=SELFIE
+}
+
+type Query {
+    totalPictures: Int!,
+    allPictures: [Picture!]!
+}
+
+type Mutation {
+    postPicture(picture: PictureInput!): Picture!
+}
+
+type Subscription {
+    pictureAdded: Picture
+}
