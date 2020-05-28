@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node index.js"
+    "start": "nodemon -e js,json,graphql"
   },
   "keywords": [],
   "author": "",
@@ -14,10 +14,6 @@
     "graphql": "^15.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.6",
-    "@babel/node": "^7.8.7",
-    "@babel/preset-env": "^7.9.6",
     "nodemon": "^2.0.4"
   }
 }

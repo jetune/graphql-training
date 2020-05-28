@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+import { gql } from 'apollo-server-express';
 
 // Define a schema
 const typeDefs = gql`
@@ -59,14 +59,9 @@ const PICTURE_ADDED_EVENT_TYPE = "PictureAddedEvent";
 // Event type
 const USER_ADDED_EVENT_TYPE = "UserAddedEvent";
 
-module.exports = {
-
-    // Export Typedef
-    typeDefs: typeDefs,
-
-    // Export Add picture event type
-    PICTURE_ADDED_EVENT_TYPE: PICTURE_ADDED_EVENT_TYPE,
-
-    // Export Add user event type
-    USER_ADDED_EVENT_TYPE: USER_ADDED_EVENT_TYPE
+// Export
+export {
+    PICTURE_ADDED_EVENT_TYPE,
+    USER_ADDED_EVENT_TYPE,
+    typeDefs
 }

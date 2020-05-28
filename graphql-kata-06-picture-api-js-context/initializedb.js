@@ -1,20 +1,7 @@
-const { ApolloServer, PubSub } = require('apollo-server');
-const { GraphQLScalarType } = require('graphql');
-const gqlSchema = require("./schema");
+// Connect to Mongo
+const mongoConnexion = new Mongo("localhost:27017");
 
-// Define a schema
-const typeDefs = gqlSchema.typeDefs;
-
-// Get the event type for added pcture
-const PICTURE_ADDED_EVENT_TYPE = gqlSchema.PICTURE_ADDED_EVENT_TYPE;
-
-// Get the event type for added user
-const USER_ADDED_EVENT_TYPE = gqlSchema.USER_ADDED_EVENT_TYPE;
-
-// Instantiate a publisher/subscriber
-const pubsub = new PubSub();
-
-// User array
+// User collection datas
 const users = [
     { "login": "jetune", "name": "Jean-Jacques ETUNE NGI", "avatar": "" },
     { "login": "ryo", "name": "Sakazaki RYO", "avatar": "" },
@@ -23,7 +10,7 @@ const users = [
     { "login": "terry", "name": "BOGARD Terry", "avatar": "" }
 ];
 
-// Picture Array
+// Picture collections
 const pictures = [
     { id: "1", "name": "picture 01", "description": "Pircture 01", url: "http://lab.adservio.fr/media/1.jpg", "category": "PORTRAIT", "postBy": users[0], "postDate": new Date("2020-05-18 16:10:22") },
     { id: "2", "name": "picture 02", "description": "Pircture 02", url: "http://lab.adservio.fr/media/2.jpg", "category": "SELFIE", "postBy": users[1], "postDate": new Date("2020-05-18 16:30:22") },
@@ -57,92 +44,83 @@ const pictures = [
     { id: "30", "name": "picture 30", "description": "Pircture 30", url: "http://lab.adservio.fr/media/30.jpg", "category": "SELFIE", "postBy": users[0], "postDate": new Date("2020-05-23 14:30:22") }
 ];
 
-// Define a resolver that fetch data on the preceding schema
-const resolvers = {
-    Query: {
-        totalPictures: () => pictures.length,
-        allPictures: () => pictures,
-        allUsers: () => users,
-        userByLogin: (_parent, args) => users.find((user) => user.login === args.login),
-        filterPictures: (_parent, args) => pictures.filter(picture => picture.category === args.category).slice(args.first, Math.min(args.first + args.count, pictures.length + 1))
+// mongoUsers to create
+const mongoUsers = [
+    {
+        db: "admin",
+        name: "admin",
+        password: "admin",
+        roles: [
+            {
+                role: "userAdminAnyDatabase", db: "admin"
+            },
+            "readWriteAnyDatabase"
+        ]
     },
-    Mutation: {
-        postUser(_parent, args) {
-
-            // Instantiate a user
-            const newUser = {
-                login: args.user.login,
-                name: args.user.name,
-                avatar: args.user.avatar,
-                publishedPictures: []
-            };
-
-            // Add the new user in the tab
-            users.push(newUser);
-
-            // Publish event
-            pubsub.publish(USER_ADDED_EVENT_TYPE, { userAdded: newUser });
-
-            // return user created
-            return newUser;
-        },
-        postPicture(_parent, args) {
-
-            // Instantiate the new picture
-            const newPicture = {
-                id: pictures.length + 1,
-                name: args.picture.name,
-                description: args.picture.description,
-                category: args.picture.category,
-                postBy: users.find((user) => user.login === args.picture.postBy),
-                postDate: new Date()
-            };
-
-            // Add the new picture in the tab
-            pictures.push(newPicture);
-
-            // Publish event
-            pubsub.publish(PICTURE_ADDED_EVENT_TYPE, { pictureAdded: newPicture });
-
-            // Return the registered picture
-            return newPicture;
-        }
-    },
-    Picture: {
-        url: (_parent) => `http://lab.adservio.fr/media/${_parent.id}.jpg`
-    },
-    User: {
-        publishedPictures: (_parent) => pictures.filter(picture => picture.postBy.login === _parent.login)
-    },
-    Subscription: {
-        pictureAdded: {
-            subscribe: () => pubsub.asyncIterator([PICTURE_ADDED_EVENT_TYPE])
-        },
-        userAdded: {
-            subscribe: () => pubsub.asyncIterator([USER_ADDED_EVENT_TYPE])
-        }
-    },
-    DateTime: new GraphQLScalarType({
-        name: "DateTime",
-        description: "Datetime custom scalar type",
-        parseValue: (value) => new Date(value),
-        serialize: (value) => value.toISOString(),
-        parseLiteral: (ast) => new Date(ast.value)
-    })
-}
-
-// Define a graphql server to expose typeDefs and resolvers
-const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    subscriptions: {
-        path: "/",
-        onConnect: () => console.log("=======> Connection to subscription")
+    {
+        db: "graphqltraining",
+        name: "graphql",
+        password: "graphql",
+        roles: [
+            {
+                role: "readWrite", db: "graphqltraining"
+            }
+        ]
     }
+];
+
+// mongoCollections to create
+const mongoCollections = [
+    {
+        db: "graphqltraining",
+        name: "users",
+        options: {
+            autoIndexId: true
+        },
+        datas: users
+    },
+    {
+        db: "graphqltraining",
+        name: "pictures",
+        options: {
+            autoIndexId: true
+        },
+        datas: pictures
+    }
+];
+
+// Create all mongoCollections
+mongoCollections.forEach(collection => {
+
+    // Select the Database
+    const selectedDb = mongoConnexion.getDB(collection.db);
+
+    // Find collection
+    const foundedCollection = selectedDb.getCollection(collection.name);
+
+    // Drop collection if exists
+    if (foundedCollection !== undefined && foundedCollection !== null) foundedCollection.drop();
+
+    // Create the collection
+    selectedDb.createCollection(collection.name, collection.options);
+
+    // Insert Datas
+    selectedDb.getCollection(collection.name).insertMany(collection.datas);
 });
 
-// Define port
-const port = process.env.PORT || 5001;
+// Create all mongoUsers
+mongoUsers.forEach(user => {
 
-// Start GraphQL Server
-server.listen(port).then(({ url }) => console.log(`Serveur GraphQL démarré : [ URL = ${url} ]`));
+    // Select the Database
+    const selectedDb = mongoConnexion.getDB(user.db);
+
+    // Drop user if exists
+    selectedDb.dropUser(user.name);
+
+    // Create the user
+    selectedDb.createUser({
+        user: user.name,
+        pwd: user.password,
+        roles: user.roles
+    });
+});

@@ -64,4 +64,4 @@ app.listen({ port: port }, () => console.log(`Serveur GraphQL démarré : [ PATH
 npm install && npm start
 ```
 
-7.	Testez l'API en allant sur l'URL qu'elle expose : `http://localhost:5001/graphql`
+7.	Testez l'API en allant sur l'URL qu'elle expose : `http://localhost:5001/graphql``
