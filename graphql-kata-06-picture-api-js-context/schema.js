@@ -61,7 +61,13 @@ const USER_ADDED_EVENT_TYPE = "UserAddedEvent";
 
 // Export
 export {
+
+    // Export Add picture event type
     PICTURE_ADDED_EVENT_TYPE,
+
+    // Export Add user event type
     USER_ADDED_EVENT_TYPE,
+
+    // Export Typedef
     typeDefs
 }

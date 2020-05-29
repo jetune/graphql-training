@@ -66,67 +66,136 @@ import { MongoClient } from 'mongodb';
 // Load the config
 dotenv.config();
 ```
-4.	Initialisez la connexion au serveur `Mongo` et récupérer une instance du handler de notre base de données de training et stockez la dans une constante qui contiendra toutes les données de contexte
+4.	Créez une fonction asynchrone d'initialisation de l'application qui se charge 
+	*	D'obtenir une connexion vers la base de donnée
+	*	Initialiser le contexte Apollo
+	*	Demarrer le serveur express et autres composants
+	*	Adapter les `Query` et `Mutation` afin d'exploiter la base de données `Mongo`
 ```
+// Fonction asynchrone d'initialization de la connexion à la base de données
+async function start() {
 
-// Create connecion client to database
-const dbClient = await MongoClient.connect(process.env.DATABASE_HOST, { useNewUrlParser: true });
+    // Create connecion client to database
+    const dbClient = await MongoClient.connect(process.env.DATABASE_HOST, { useNewUrlParser: true });
 
-// Extraction de la référence de base de données
-const db = dbClient.db();
+    // Log
+    console.log('Connexion to database OK');
 
-// Extraction de la référence de base de données et stockage dans une variable
-const context = { db };
+    // Extract db instance
+    const db = dbClient.db();
 
-```
+    // Création d'une instance applicative express
+    const app = express();
 
-5.	Construisez le serveur `Apollo` en lui spécifiant les données de contexte
-```
+    // Instantiate a publisher/subscriber
+    const pubsub = new PubSub();
 
-// Define a graphql server to expose typeDefs and resolvers
-const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context,
-    subscriptions: {
-        path: "/",
-        onConnect: () => console.log("=======> Connection to subscription")
+    // Define a resolver that fetch data on the preceding schema
+    const resolvers = {
+        Query: {
+            totalPictures: () => db.collection('pictures').estimatedDocumentCount(),
+            allPictures: () => db.collection('pictures').find().toArray(),
+            allUsers: () => db.collection('users').find().toArray(),
+            userByLogin: (_parent, args) => db.collection('users').findOne({ login: args.login }),
+            filterPictures: (_parent, args) => db.collection('pictures').find({ category: args.category }).limit(args.count).skip(args.first).toArray()
+        },
+        Mutation: {
+            async postUser(_parent, args) {
+
+                // Instantiate a user
+                const newUser = {
+                    login: args.user.login,
+                    name: args.user.name,
+                    avatar: args.user.avatar,
+                    publishedPictures: []
+                };
+
+                // Add the new user in the tab
+                db.collection('users').insertOne(newUser);
+
+                // Publish event
+                pubsub.publish(USER_ADDED_EVENT_TYPE, { userAdded: newUser });
+
+                // return user created
+                return newUser;
+            },
+            async postPicture(_parent, args) {
+
+                // Get the picture count
+                const pictureCount = await db.collection('pictures').estimatedDocumentCount();
+
+                // get user by name
+                const owner = await db.collection('users').findOne({ login: args.picture.postBy });
+
+                // Instantiate the new picture
+                const newPicture = {
+                    id: pictureCount + 1,
+                    name: args.picture.name,
+                    description: args.picture.description,
+                    category: args.picture.category,
+                    url: `http://lab.adservio.fr/media/${pictureCount + 1}.jpg`,
+                    postBy: owner,
+                    postDate: new Date()
+                };
+
+                // Add the new picture in collection
+                db.collection('pictures').insertOne(newPicture);
+
+                // Publish event
+                pubsub.publish(PICTURE_ADDED_EVENT_TYPE, { pictureAdded: newPicture });
+
+                // Return the registered picture
+                return newPicture;
+            }
+        },
+        User: {
+            publishedPictures: (_parent) => db.collection('pictures').find({ "postBy.login": _parent.login }).toArray()
+        },
+        Subscription: {
+            pictureAdded: {
+                subscribe: () => pubsub.asyncIterator([PICTURE_ADDED_EVENT_TYPE])
+            },
+            userAdded: {
+                subscribe: () => pubsub.asyncIterator([USER_ADDED_EVENT_TYPE])
+            }
+        },
+        DateTime: new GraphQLScalarType({
+            name: "DateTime",
+            description: "Datetime custom scalar type",
+            parseValue: (value) => new Date(value),
+            serialize: (value) => value.toISOString(),
+            parseLiteral: (ast) => new Date(ast.value)
+        })
     }
-});
+
+    // Define a graphql server to expose typeDefs and resolvers
+    const server = new ApolloServer({
+        typeDefs,
+        resolvers,
+        context: { db },
+        subscriptions: {
+            onConnect: () => console.log("=======> Connection to subscription")
+        }
+    });
+
+    // Mount Express App Middleware on apollo server
+    server.applyMiddleware({ app });
+
+    // Create an HTTP Server
+    const httpServer = http.createServer(app);
+
+    // Install Subscription handlers
+    server.installSubscriptionHandlers(httpServer);
+
+    // Define port
+    const port = process.env.PORT || 5001;
+
+    // Start GraphQL Server
+    httpServer.listen(port, () => {
+        console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`)
+        console.log(`🚀 Subscriptions ready at ws://localhost:${port}${server.subscriptionsPath}`)
+    });
+};
 ```
 
-
-
-
-
-
-4.	Associez l'application middleware `express` au serveur `Apollo` après l'avoir configuré
-```
-
-// Define a graphql server to expose typeDefs and resolvers
-const server = new ApolloServer({
-    ...
-});
-
-// Mount Express App Middleware on apollo server
-server.applyMiddleware({ app });
-```
-
-5.	Définissez le routage de la page d'accueil de l'application et configurez le port d'écoute
-```	
-// Create home route
-app.get('/', (request, response) => response.send('Welcome to PhotoShare API'));
-
-// Define port
-const port = process.env.PORT || 5001;
-
-// Start GraphQL Server
-app.listen({ port: port }, () => console.log(`Serveur GraphQL démarré : [ PATH = http://localhost:${port}${server.graphqlPath} ]`));
-```
-
-6.	Démarrez votre application après avoir installé les dépendances
-```	
-npm install && npm start
-```
-
-7.	Testez l'API en allant sur l'URL qu'elle expose : `http://localhost:5001/graphql``
+5.	Démarrez et testez la nouvelle version de l'API
