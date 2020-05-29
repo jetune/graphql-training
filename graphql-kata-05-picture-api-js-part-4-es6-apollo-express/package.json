@@ -1,5 +1,5 @@
 {
-  "name": "graphql-kata-training",
+  "name": "intro-01",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,10 +14,10 @@
     "graphql": "^15.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.6",
-    "@babel/node": "^7.8.7",
-    "@babel/preset-env": "^7.9.6",
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.1",
+    "@babel/node": "^7.10.1",
+    "@babel/preset-env": "^7.10.1",
     "nodemon": "^2.0.4"
   }
 }
