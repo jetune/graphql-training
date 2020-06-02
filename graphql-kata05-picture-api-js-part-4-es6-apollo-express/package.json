@@ -1,5 +1,5 @@
 {
-  "name": "intro-01",
+  "name": "graphql-kata-training",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,10 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "apollo-server-express": "^2.14.1",
-    "express": "^4.17.1",
-    "graphql": "^15.0.0",
-    "subscriptions-transport-ws": "^0.9.16"
+    "apollo-server": "^2.13.1",
+    "graphql": "^15.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
